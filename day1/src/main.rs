@@ -11,11 +11,26 @@ fn main() {
         .lines()
         .map(|line| line.unwrap().parse::<u64>().unwrap())
         .collect();
-
+    
+    // Part 1
     for x in numbers.iter() {
         for y in numbers.iter() {
             if x + y == 2020 {
-                println!("{} {} = 2020, {} * {} = {}", x, y, x, y, x*y);
+                println!("{} + {} = 2020, {} * {} = {}", x, y, x, y, x*y);
+            }
+        }
+    }
+
+    // Part 2
+    for x in numbers.iter() {
+        for y in numbers.iter() {
+            if x+y >= 2020 {
+                continue;
+            }
+            for z in numbers.iter() {
+                if x+y+z == 2020 {
+                    println!("{} + {} + {} = 2020, {} * {} * {} = {}", x, y, z, x, y, z, x*y*z);
+                }
             }
         }
     }
