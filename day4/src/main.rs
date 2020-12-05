@@ -27,12 +27,12 @@ fn main() {
     let mut valid_passports: u64 = 0;
 
     for passport in passports {
-        println!("Passport:");
+        println!("Passport: {}", &passport.get(&"pid".to_string()).get_or_insert(&"XXX".to_string()));
         for (key, value) in &passport {
-            println!(" - {} : {}", key, value);
+            //println!(" - {} : {}", key, value);
         }
         let valid = verify_passport(&passport);
-        println!(" - VALID: {}", &valid);
+        println!(" - VALID: {}\n\n", &valid);
         if valid { valid_passports += 1; }
     }
 
@@ -53,8 +53,130 @@ fn verify_passport(passport: &HashMap<String, String>) -> bool {
 
     for field in required_fields {
         if ! passport.contains_key(&field.to_string()) {
+            println!(" - Invalid: Missing fields. ");
             return false;
         }
+    }
+    
+    if ! verify_year(&passport, "byr".to_string(), 1920, 2002){
+        println!(" - Invalid byr: {}", &passport.get(&"byr".to_string()).unwrap());
+        return false 
+    };
+    if ! verify_year(&passport, "iyr".to_string(), 2010, 2020){ 
+        println!(" - Invalid iyr: {}", &passport.get(&"iyr".to_string()).unwrap());
+        return false 
+    };
+    if ! verify_year(&passport, "eyr".to_string(), 2020, 2030){ 
+        println!(" - Invalid eyr: {}", &passport.get(&"eyr".to_string()).unwrap());
+        return false 
+    };
+    if ! verify_height(&passport){ 
+        println!(" - Invalid hgt: {}", &passport.get(&"hgt".to_string()).unwrap());
+        return false };
+    if ! verify_hair_color(&passport){ 
+        println!(" - Invalid hcl: {}", &passport.get(&"hcl".to_string()).unwrap());
+        return false };
+    if ! verify_eye_color(&passport){ 
+        println!(" - Invalid ecl: {}", &passport.get(&"ecl".to_string()).unwrap());
+        return false };
+    if ! verify_pid(&passport){ 
+        println!(" - Invalid pid: {}", &passport.get(&"pid".to_string()).unwrap());
+        return false };
+
+    return true;
+}
+
+fn verify_year(passport: &HashMap<String,String> , field:String, minimum:u64, maximum:u64) -> bool {
+    // Must be an int between 1920 and 2002.
+    let value: u64 = passport.get(&field)
+        .unwrap()
+        .as_str()
+        .parse::<u64>()
+        .unwrap();
+
+    if value >= minimum && value <= maximum {
+        return true;
+    }
+    return false;
+}
+
+fn verify_height(passport: &HashMap<String,String>) -> bool {
+    // Verify if height is within limits.
+    
+    let height: String = passport.get(&"hgt".to_string()).unwrap().clone();
+    
+    let value: u64 = height.clone()
+        .replace("cm", "")
+        .replace("in", "")
+        .as_str()
+        .parse::<u64>()
+        .unwrap();
+
+    if height.as_str().contains("in") && value >= 59 && value <= 76 {
+        return true;
+    }
+    if height.as_str().contains("cm") && value >= 150 && value <= 193 {
+        return true;
+    }
+    return false;
+}
+
+fn verify_hair_color(passport: &HashMap<String, String>) -> bool {
+    // Verify the format of the hair color field.
+    let valid_digits = vec!['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+                            'a', 'b', 'c', 'd', 'e', 'f'];
+
+    let mut value: String = passport.get(&"hcl".to_string()).unwrap().clone();
+    
+    if ! value.len() == 7 { return false; }
+
+    for _ in 0..6 {
+        let character_opt = value.pop();
+        if character_opt.is_none() { return false; }
+        let character = character_opt.unwrap();
+        if ! valid_digits.contains(&character) { return false; }
+    }
+    let last_character_opt = value.pop();
+    if last_character_opt.is_none() { return false; }
+    let last_character = last_character_opt.unwrap();
+    if last_character != '#' { return false; }
+
+    return true;
+}
+
+fn verify_eye_color(passport: &HashMap<String, String>) -> bool {
+    // Verify that the eye color is one of the valid options.
+    let valid_options = vec![
+        "amb".to_string(), 
+        "blu".to_string(), 
+        "brn".to_string(), 
+        "gry".to_string(), 
+        "grn".to_string(), 
+        "hzl".to_string(), 
+        "oth".to_string()
+    ];
+    
+    let value: String = passport.get(&"ecl".to_string()).unwrap().clone();
+    
+    if value.len() != 3 { return false; };
+
+    if valid_options.contains(&value) { return true; }
+    return false;
+}
+
+fn verify_pid(passport: &HashMap<String, String>) -> bool {
+    // Verify the format of the pid field.
+    let valid_digits = vec!['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+
+    let mut value: String = passport.get(&"pid".to_string()).unwrap().clone();
+    
+    if ! value.len() == 9 { return false; }
+
+    for _ in 0..9 {
+        let character_opt = value.pop();
+        if character_opt.is_none() { return false; }
+        let character = character_opt.unwrap();
+        if ! valid_digits.contains(&character) { return false; }
     }
     return true;
 }
