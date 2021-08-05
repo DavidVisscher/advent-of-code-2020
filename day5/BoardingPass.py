@@ -1,9 +1,10 @@
+from functools import total_ordering
 from math import floor, ceil
 from typing import Tuple
 
 from day5.exceptions import IncorrectSplitCharacterException, IncorrectBoardingPassException
 
-
+@total_ordering
 class BoardingPass():
 
     def __init__(self, row: int, column: int):
