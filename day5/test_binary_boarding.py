@@ -4,8 +4,8 @@ Tests for the binary boarding module.
 
 import pytest
 
-from day5.binary_boarding import split_range, calulate_seat_id, determine_seat_from_boardingpass, \
-    get_seat_id_for_boarding_pass, get_maximum_seat_id_for_boarding_passes, read_list_of_boarding_passes_from_file
+from day5.BoardingPass import *
+from day5.binary_boarding import *
 from day5.exceptions import IncorrectSplitCharacterException, IncorrectBoardingPassException
 
 
@@ -31,36 +31,36 @@ def test_if_column_range_splits_correctly():
 
 
 def test_seat_id_calculation():
-    assert calulate_seat_id({"row": 70, "column": 7}) == 567
-    assert calulate_seat_id({"row": 14, "column": 7}) == 119
-    assert calulate_seat_id({"row": 102, "column": 4}) == 820
+    assert BoardingPass(70, 7).seat_id == 567
+    assert BoardingPass(14, 7).seat_id == 119
+    assert BoardingPass(102, 4).seat_id == 820
 
 
 def test_wrong_boarding_pass_raises_exception():
     with pytest.raises(IncorrectBoardingPassException):
-        determine_seat_from_boardingpass("QWERTY")
+        determine_seat_location_from_code("QWERTY")
     with pytest.raises(IncorrectBoardingPassException):
-        determine_seat_from_boardingpass("LFFFBBFRRRR")
+        determine_seat_location_from_code("LFFFBBFRRRR")
     with pytest.raises(IncorrectBoardingPassException):
-        determine_seat_from_boardingpass("LFFFBBFRR")
+        determine_seat_location_from_code("LFFFBBFRR")
     with pytest.raises(IncorrectBoardingPassException):
-        determine_seat_from_boardingpass("BFFFBBFFFF")
+        determine_seat_location_from_code("BFFFBBFFFF")
     with pytest.raises(IncorrectBoardingPassException):
-        determine_seat_from_boardingpass("LFFFBBFRRR")
+        determine_seat_location_from_code("LFFFBBFRRR")
     with pytest.raises(IncorrectBoardingPassException):
-        determine_seat_from_boardingpass("LFFFBBFFRR")
+        determine_seat_location_from_code("LFFFBBFFRR")
 
 
 def test_seat_calculation():
-    assert determine_seat_from_boardingpass("BFFFBBFRRR") == {"row": 70, "column": 7}
-    assert determine_seat_from_boardingpass("FFFBBBFRRR") == {"row": 14, "column": 7}
-    assert determine_seat_from_boardingpass("BBFFBBFRLL") == {"row": 102, "column": 4}
+    assert determine_seat_location_from_code("BFFFBBFRRR") == {"row": 70, "column": 7}
+    assert determine_seat_location_from_code("FFFBBBFRRR") == {"row": 14, "column": 7}
+    assert determine_seat_location_from_code("BBFFBBFRLL") == {"row": 102, "column": 4}
 
 
 def test_seat_for_boarding_pass():
-    assert get_seat_id_for_boarding_pass("BFFFBBFRRR") == 567
-    assert get_seat_id_for_boarding_pass("FFFBBBFRRR") == 119
-    assert get_seat_id_for_boarding_pass("BBFFBBFRLL") == 820
+    assert BoardingPass.from_character_code("BFFFBBFRRR").seat_id == 567
+    assert BoardingPass.from_character_code("FFFBBBFRRR").seat_id == 119
+    assert BoardingPass.from_character_code("BBFFBBFRLL").seat_id == 820
 
 
 def test_read_passes_from_file():
@@ -77,3 +77,41 @@ def test_highest_seat_id_for_boarding_passes():
     assert get_maximum_seat_id_for_boarding_passes(["BFFFBBFRRR", "FFFBBBFRRR"]) == 567
     assert get_maximum_seat_id_for_boarding_passes(["BFFFBBFRRR"]) == 567
     assert get_maximum_seat_id_for_boarding_passes(["BFFFBBFRRR", "FFFBBBFRRR", "BBFFBBFRLL"]) == 820
+
+
+def test_correct_outcome_for_challenge_set():
+    passes = read_list_of_boarding_passes_from_file("boarding_passes.txt")
+    assert get_maximum_seat_id_for_boarding_passes(passes) == 866
+
+
+def test_boarding_passes_eq():
+    pass1 = BoardingPass(1, 1)
+    pass2 = BoardingPass(1, 1)
+    pass3 = BoardingPass(1, 2)
+    assert pass1 == pass2
+    assert not pass1 == pass3
+    assert pass1 != pass3
+    assert not pass2 == pass3
+    assert pass2 != pass3
+
+
+def test_boarding_passes_lt_gt():
+    pass1 = BoardingPass(1, 3)
+    pass2 = BoardingPass(2, 1)
+    pass3 = BoardingPass(3, 1)
+    assert pass1 < pass2
+    assert pass2 > pass1
+    assert pass1 < pass2 < pass3
+    assert pass3 > pass2 > pass1
+
+
+def test_sorting_boarding_passes():
+    pass1 = BoardingPass(3, 1)
+    pass2 = BoardingPass(50, 1)
+    pass3 = BoardingPass(50, 2)
+    passes = [pass3, pass2, pass1]
+
+    sorted_passes = sorted(passes)
+    assert sorted_passes[0] == pass1
+    assert sorted_passes[1] == pass2
+    assert sorted_passes[2] == pass3
