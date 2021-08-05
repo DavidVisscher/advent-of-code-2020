@@ -1,6 +1,7 @@
 """
 Tests for the binary boarding module.
 """
+import tempfile
 
 import pytest
 
@@ -64,23 +65,19 @@ def test_seat_for_boarding_pass():
 
 
 def test_read_pass_codes_from_file():
-    """
-    Requires testpasses.txt to contain:
-    BFFFBBFRRR
-    FFFBBBFRRR
-    BBFFBBFRLL
-    """
-    assert read_list_of_boarding_passes_from_file("testpasses.txt") == ["BFFFBBFRRR", "FFFBBBFRRR", "BBFFBBFRLL"]
+    testfile_handle = tempfile.mkstemp(text=True)
+    with open(testfile_handle[1], 'w') as testfile:
+        testfile.write("BFFFBBFRRR\nFFFBBBFRRR\nBBFFBBFRLL")
+
+    assert read_list_of_boarding_passes_from_file(testfile_handle[1]) == ["BFFFBBFRRR", "FFFBBBFRRR", "BBFFBBFRLL"]
 
 
 def test_read_passes_from_file_and_create():
-    """
-    Requires testpasses.txt to contain:
-    BFFFBBFRRR
-    FFFBBBFRRR
-    BBFFBBFRLL
-    """
-    boarding_passes = create_boarding_passes_from_file("testpasses.txt")
+    testfile_handle = tempfile.mkstemp(text=True)
+    with open(testfile_handle[1], 'w') as testfile:
+        testfile.write("BFFFBBFRRR\nFFFBBBFRRR\nBBFFBBFRLL")
+
+    boarding_passes = create_boarding_passes_from_file(testfile_handle[1])
 
     assert boarding_passes[0] == BoardingPass(70,7)
     assert boarding_passes[1] == BoardingPass(14,7)
