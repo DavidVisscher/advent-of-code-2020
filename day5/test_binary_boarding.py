@@ -65,19 +65,23 @@ def test_seat_for_boarding_pass():
 
 
 def test_read_pass_codes_from_file():
-    testfile_handle = tempfile.mkstemp(text=True)
-    with open(testfile_handle[1], 'w') as testfile:
-        testfile.write("BFFFBBFRRR\nFFFBBBFRRR\nBBFFBBFRLL")
-
-    assert read_list_of_boarding_passes_from_file(testfile_handle[1]) == ["BFFFBBFRRR", "FFFBBBFRRR", "BBFFBBFRLL"]
+    """
+    Requires testpasses.txt to contain:
+    BFFFBBFRRR
+    FFFBBBFRRR
+    BBFFBBFRLL
+    """
+    assert read_list_of_boarding_passes_from_file("day5/testpasses.txt") == ["BFFFBBFRRR", "FFFBBBFRRR", "BBFFBBFRLL"]
 
 
 def test_read_passes_from_file_and_create():
-    testfile_handle = tempfile.mkstemp(text=True)
-    with open(testfile_handle[1], 'w') as testfile:
-        testfile.write("BFFFBBFRRR\nFFFBBBFRRR\nBBFFBBFRLL")
-
-    boarding_passes = create_boarding_passes_from_file(testfile_handle[1])
+    """
+    Requires testpasses.txt to contain:
+    BFFFBBFRRR
+    FFFBBBFRRR
+    BBFFBBFRLL
+    """
+    boarding_passes = create_boarding_passes_from_file("day5/testpasses.txt")
 
     assert boarding_passes[0] == BoardingPass(70,7)
     assert boarding_passes[1] == BoardingPass(14,7)
@@ -97,7 +101,7 @@ def test_highest_seat_id_for_boarding_passes():
 
 
 def test_correct_outcome_for_challenge_set():
-    boarding_passes = create_boarding_passes_from_file("boarding_passes.txt")
+    boarding_passes = create_boarding_passes_from_file("day5/boarding_passes.txt")
     assert get_maximum_seat_id_for_boarding_passes(boarding_passes) == 866
     assert find_gaps_between_boarding_passes(boarding_passes) == [583]
 
