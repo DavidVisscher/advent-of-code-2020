@@ -63,7 +63,7 @@ def test_seat_for_boarding_pass():
     assert BoardingPass.from_character_code("BBFFBBFRLL").seat_id == 820
 
 
-def test_read_passes_from_file():
+def test_read_pass_codes_from_file():
     """
     Requires testpasses.txt to contain:
     BFFFBBFRRR
@@ -71,6 +71,21 @@ def test_read_passes_from_file():
     BBFFBBFRLL
     """
     assert read_list_of_boarding_passes_from_file("testpasses.txt") == ["BFFFBBFRRR", "FFFBBBFRRR", "BBFFBBFRLL"]
+
+
+def test_read_passes_from_file_and_create():
+    """
+    Requires testpasses.txt to contain:
+    BFFFBBFRRR
+    FFFBBBFRRR
+    BBFFBBFRLL
+    """
+    boarding_passes = create_boarding_passes_from_file("testpasses.txt")
+
+    assert boarding_passes[0] == BoardingPass(70,7)
+    assert boarding_passes[1] == BoardingPass(14,7)
+    assert boarding_passes[2] == BoardingPass(102,4)
+
 
 
 def test_highest_seat_id_for_boarding_passes():

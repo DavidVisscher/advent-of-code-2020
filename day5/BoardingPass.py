@@ -9,6 +9,7 @@ class BoardingPass():
     def __init__(self, row: int, column: int):
         self.row = row
         self.column = column
+        self.code = "XXXXXXXXXX"
 
     @property
     def seat_id(self):
@@ -36,7 +37,9 @@ class BoardingPass():
     @classmethod
     def from_character_code(cls, boarding_pass_code: str):
         seat_location = determine_seat_location_from_code(boarding_pass_code)
-        return cls(seat_location["row"], seat_location["column"])
+        boarding_pass = cls(seat_location["row"], seat_location["column"])
+        boarding_pass.code = boarding_pass_code
+        return boarding_pass
 
 
 def determine_seat_location_from_code(boarding_pass_code):

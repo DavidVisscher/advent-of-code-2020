@@ -25,3 +25,12 @@ def get_maximum_seat_id_for_boarding_passes(boarding_pass_codes: List):
             current_max = boarding_pass.seat_id
 
     return current_max
+
+
+def create_boarding_passes_from_file(filename):
+    pass_codes = read_list_of_boarding_passes_from_file(filename)
+    out = []
+
+    for pass_code in pass_codes:
+        out.append(BoardingPass.from_character_code(pass_code))
+    return out
