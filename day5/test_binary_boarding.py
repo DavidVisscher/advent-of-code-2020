@@ -6,7 +6,7 @@ import tempfile
 import pytest
 
 from day5.BoardingPass import *
-from day5.binary_boarding import *
+from day5.main import *
 from day5.exceptions import IncorrectSplitCharacterException, IncorrectBoardingPassException
 
 
