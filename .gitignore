@@ -1,5 +1,6 @@
 target/
 *.swp
 **/venv/**
+**/__pycache__/**
 .idea/
 .pytest_cache/
