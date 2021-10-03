@@ -30,6 +30,28 @@ class SackGraph:
         """
         return color in self._links.keys()
 
+    def possible_outer_bags(self, color: str) -> Set[AnyStr]:
+        """
+        Returns a set of all bags that can contain bag of 'color'
+        """
+        out = set()
+        for candidate_color in self.colors_in_graph:
+            candidate_contents = self.get_contents(candidate_color)
+            if color in candidate_contents.keys():
+                out.add(candidate_color)
+        return out
+
+    @classmethod
+    def from_file(cls, filename):
+        graph = cls()
+        graph.load_file(filename)
+        return graph
+
+    def load_file(self, filename):
+        with open(filename, "r") as file_handle:
+            for line in file_handle:
+                self.parse_link(line)
+
     def parse_link(self, link_string):
         """
         Parses a link from a given string of the form:
@@ -37,6 +59,8 @@ class SackGraph:
         for example:
         light red bags contain 1 bright white bag, 2 muted yellow bags.
         """
+        if "no other bags" in link_string:
+            return  # Do nothing, this isn't a link
         outer_bag_string, contained_bags_string = link_string.split("contain")
         outer_bag_color = outer_bag_string.replace("bags", "").strip()
 
@@ -72,3 +96,15 @@ class SackGraph:
                 out[contained_bag_color] = contained_bag_amount
 
         return out
+
+    def get_content_count(self, outer_bag_color) -> int:
+        """
+        Gets the amount of bags that must be in a bag of a certain color.
+        """
+        total = 0
+        for link in self._links[outer_bag_color]:
+            link_color = link["contains"]
+            link_amount = link["amount"]
+            total += link_amount
+            total += link_amount * self.get_content_count(link_color)
+        return total
