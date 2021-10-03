@@ -1,0 +1,2 @@
+class UnknownBagException(KeyError):
+    pass
